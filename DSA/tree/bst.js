@@ -11,29 +11,24 @@ class BST {
     this.root = null;
   }
 
-  // insert method
-
   insert(value) {
     const newNode = new Node(value);
-
     if (!this.root) {
       this.root = newNode;
       return this;
     }
 
     let currentNode = this.root;
-
     while (true) {
-      if (currentNode.value === value) return undefined;
-
+      if (value === currentNode.value) return undefined;
       if (value < currentNode.value) {
-        if (currentNode.left === null) {
+        if (!currentNode.left) {
           currentNode.left = newNode;
           return this;
         }
         currentNode = currentNode.left;
       } else {
-        if (currentNode.right === null) {
+        if (!currentNode.right) {
           currentNode.right = newNode;
           return this;
         }
@@ -42,13 +37,10 @@ class BST {
     }
   }
 
-  // find method
-
   find(value) {
     if (!this.root) return null;
 
     let currentNode = this.root;
-
     while (currentNode) {
       if (value < currentNode.value) {
         currentNode = currentNode.left;
@@ -58,27 +50,46 @@ class BST {
         return currentNode;
       }
     }
-
-    return undefined;
+    return null;
   }
 
-  // contains method
-
   contains(value) {
-    if (!this.root) return null;
+    return !!this.find(value);
+  }
 
-    let currentNode = this.root;
+  remove(value) {
+    this.root = this._removeNode(this.root, value);
+  }
 
-    while (currentNode) {
-      if (value < currentNode.value) {
-        currentNode = currentNode.left;
-      } else if (value > currentNode.value) {
-        currentNode = currentNode.right;
+  _removeNode(node, value) {
+    if (!node) return null;
+
+    if (value < node.value) {
+      node.left = this._removeNode(node.left, value);
+      return node;
+    } else if (value > node.value) {
+      node.right = this._removeNode(node.right, value);
+      return node;
+    } else {
+      if (!node.left && !node.right) {
+        return null;
+      } else if (!node.left) {
+        return node.right;
+      } else if (!node.right) {
+        return node.left;
       } else {
-        return true;
+        const minNode = this._findMin(node.right);
+        node.value = minNode.value;
+        node.right = this._removeNode(node.right, minNode.value);
+        return node;
       }
     }
+  }
 
-    return false;
+  _findMin(node) {
+    while (node.left) {
+      node = node.left;
+    }
+    return node;
   }
 }
